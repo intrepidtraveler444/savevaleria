@@ -1,13 +1,17 @@
 /* =============================================================================
-   store.js — tiny JSON-file data store
+   store.js — in-memory JSON store with pluggable persistence.
    -----------------------------------------------------------------------------
-   Deliberately isolated behind a small API so the rest of the app never touches
-   the file directly. To move to a real database later (Postgres, SQLite, Mongo),
-   reimplement these methods and nothing else has to change.
+   The whole database is a single JSON object held in memory; the public API is
+   synchronous so the rest of the app stays simple. Where that object is *saved*
+   depends on configuration:
 
-   Concurrency note: Node runs our request handlers on a single thread, so reads
-   and in-memory mutations are atomic between `await` points. Writes are debounced
-   and flushed atomically (temp file + rename) to avoid corruption on crash.
+     • Upstash Redis (free, no credit card) — set UPSTASH_REDIS_REST_URL and
+       UPSTASH_REDIS_REST_TOKEN. Data then survives restarts/redeploys, which the
+       free hosting tier otherwise wipes. Recommended for a real, hands-off run.
+
+     • Local JSON file (default) — good for local dev; NOT durable on free hosts.
+
+   Reads are always from memory. Writes are debounced and pushed to the backend.
    ============================================================================= */
 "use strict";
 const fs = require("fs");
@@ -15,33 +19,69 @@ const path = require("path");
 const cfg = require("../config");
 
 const EMPTY = {
-  users: [],
-  items: [],        // auction listings (all statuses)
-  bids: [],
-  payments: [],
-  notifications: [],
+  users: [], items: [], bids: [], payments: [], notifications: [],
   meta: { seeded: false },
 };
 
+// ---- Upstash (Redis REST) config ----
+const U_URL = (process.env.UPSTASH_REDIS_REST_URL || "").replace(/\/+$/, "");
+const U_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || "";
+const U_KEY = process.env.UPSTASH_DB_KEY || "valeria_db";
+const useUpstash = !!(U_URL && U_TOKEN);
+
 let db = null;
 let flushTimer = null;
+let persistDisabled = false;   // set if Upstash load fails, to avoid clobbering good data
 
 function ensureDirs() {
   fs.mkdirSync(cfg.paths.data, { recursive: true });
   fs.mkdirSync(cfg.paths.uploads, { recursive: true });
 }
 
-function load() {
+function backfill(obj) {
+  for (const k of Object.keys(EMPTY)) if (!(k in obj)) obj[k] = structuredClone(EMPTY[k]);
+  return obj;
+}
+
+// Run a single Redis command via the Upstash REST API (command as a JSON array).
+async function upstash(args) {
+  const res = await fetch(U_URL, {
+    method: "POST",
+    headers: { Authorization: "Bearer " + U_TOKEN, "Content-Type": "application/json" },
+    body: JSON.stringify(args),
+  });
+  if (!res.ok) throw new Error("Upstash HTTP " + res.status + ": " + (await res.text()));
+  return (await res.json()).result;
+}
+
+/* -------- boot-time load (async) — call once before serving -------- */
+async function init() {
+  ensureDirs();
+  if (useUpstash) {
+    try {
+      const raw = await upstash(["GET", U_KEY]);
+      db = raw ? backfill(JSON.parse(raw)) : structuredClone(EMPTY);
+      console.log("Store: using Upstash (persistent). " + (raw ? "Loaded existing data." : "Fresh database."));
+      if (!raw) flush(true); // create the key on first run
+    } catch (e) {
+      // Don't overwrite possibly-good remote data on a transient read failure:
+      // run in memory this session and disable writes.
+      console.error("Store: Upstash load failed — running in safe in-memory mode (no writes). " + e.message);
+      db = structuredClone(EMPTY);
+      persistDisabled = true;
+    }
+  } else {
+    loadFile();
+    console.log("Store: using local file (NOT durable on free hosting).");
+  }
+  return db;
+}
+
+function loadFile() {
   ensureDirs();
   if (fs.existsSync(cfg.paths.db)) {
-    try {
-      db = JSON.parse(fs.readFileSync(cfg.paths.db, "utf8"));
-      // Backfill any newly added collections.
-      for (const k of Object.keys(EMPTY)) if (!(k in db)) db[k] = structuredClone(EMPTY[k]);
-    } catch (e) {
-      console.error("Could not parse db.json — starting empty. (" + e.message + ")");
-      db = structuredClone(EMPTY);
-    }
+    try { db = backfill(JSON.parse(fs.readFileSync(cfg.paths.db, "utf8"))); }
+    catch (e) { console.error("Could not parse db.json — starting empty. (" + e.message + ")"); db = structuredClone(EMPTY); }
   } else {
     db = structuredClone(EMPTY);
     flush(true);
@@ -50,21 +90,28 @@ function load() {
 }
 
 function data() {
-  if (!db) load();
+  if (!db) loadFile();   // sync fallback (file mode / direct tooling)
   return db;
 }
 
-// Atomic write: serialise to a temp file, then rename over the target.
-function flush(immediate) {
-  const doWrite = () => {
-    flushTimer = null;
+/* -------- persistence -------- */
+function writeNow() {
+  flushTimer = null;
+  if (persistDisabled || !db) return;
+  if (useUpstash) {
+    // Fire-and-forget; log failures but never crash a request over a write.
+    upstash(["SET", U_KEY, JSON.stringify(db)]).catch((e) => console.error("Store: Upstash write failed — " + e.message));
+  } else {
     const tmp = cfg.paths.db + ".tmp";
     fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
     fs.renameSync(tmp, cfg.paths.db);
-  };
-  if (immediate) return doWrite();
+  }
+}
+
+function flush(immediate) {
+  if (immediate) return writeNow();
   if (flushTimer) return;
-  flushTimer = setTimeout(doWrite, 50);
+  flushTimer = setTimeout(writeNow, 200); // debounce bursts of writes
 }
 
 /* -------- collection helpers -------- */
@@ -75,7 +122,8 @@ function table(name) {
 }
 
 const store = {
-  load,
+  init,
+  load: loadFile,        // kept for backward compatibility (sync file load)
   data,
   save: () => flush(false),
   saveNow: () => flush(true),
@@ -85,17 +133,11 @@ const store = {
   filter: (name, pred) => table(name).filter(pred),
   byId: (name, id) => table(name).find((r) => r.id === id),
 
-  insert(name, row) {
-    table(name).push(row);
-    flush(false);
-    return row;
-  },
+  insert(name, row) { table(name).push(row); flush(false); return row; },
   update(name, id, patch) {
     const row = store.byId(name, id);
     if (!row) return null;
-    Object.assign(row, patch);
-    flush(false);
-    return row;
+    Object.assign(row, patch); flush(false); return row;
   },
   remove(name, id) {
     const arr = table(name);

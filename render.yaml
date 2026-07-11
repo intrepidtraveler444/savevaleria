@@ -22,6 +22,13 @@ services:
         sync: false            # set this yourself in the Render dashboard
       - key: CORS_ORIGIN
         sync: false            # set to your Netlify URL, e.g. https://valeria.netlify.app
+      # --- Free permanent storage (Upstash) so data survives restarts ---
+      # Create a free database at https://upstash.com (no credit card), then paste
+      # its REST URL + token here. Without these, data resets when the server idles.
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
       # --- For real card payments (optional) ---
       # - key: PAYMENT_PROVIDER
       #   value: stripe

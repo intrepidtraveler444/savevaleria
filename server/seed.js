@@ -17,7 +17,8 @@ function makeUser(name, email, password, role) {
 }
 
 function seed() {
-  store.load();
+  // Data is already loaded by store.init() at boot — do NOT reload here (that
+  // would overwrite persisted Upstash data). Only seed if the DB is empty.
   const users = store.all("users");
   if (users.length > 0) return { seeded: false };
 
@@ -76,12 +77,14 @@ function seed() {
   }
 
   store.saveNow();
-  console.log("Seeded database:");
-  console.log("  Admin  →", cfg.admin.email, "/", cfg.admin.password);
-  console.log("  Donor  → donor@example.com / password123");
-  console.log("  Bidder → bidder@example.com / password123");
+  // Note: we intentionally do NOT log the admin password.
+  console.log("Seeded database. Admin email:", cfg.admin.email);
+  console.log("  Demo: donor@example.com / password123 · bidder@example.com / password123");
   return { seeded: true };
 }
 
-if (require.main === module) seed();
+// Allow `npm run seed` to run standalone (loads persistence first).
+if (require.main === module) {
+  (async () => { await store.init(); seed(); await store.saveNow(); })();
+}
 module.exports = { seed };

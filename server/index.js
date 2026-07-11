@@ -18,10 +18,6 @@ const Router = require("./lib/router");
 const { seed } = require("./seed");
 const { finalizeDue } = require("./lib/finalize");
 
-// --- boot: load data + seed on first run ---
-store.load();
-seed();
-
 // --- API router ---
 const api = new Router();
 require("./routes/auth.routes")(api);
@@ -30,9 +26,6 @@ require("./routes/auctions.routes")(api);
 require("./routes/payments.routes")(api);
 require("./routes/admin.routes")(api);
 require("./routes/gofundme.routes")(api);
-
-// Settle finished auctions periodically (belt-and-braces alongside lazy finalisation).
-setInterval(() => { try { finalizeDue(); } catch (e) { console.error(e); } }, 30000).unref();
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, "http://localhost");
@@ -86,12 +79,20 @@ const server = http.createServer((req, res) => {
   staticFiles.notFound(res);
 });
 
-server.listen(cfg.port, () => {
-  console.log(`\n  Valeria fundraiser + auction platform`);
-  console.log(`  ────────────────────────────────────`);
-  console.log(`  Marketing site : http://localhost:${cfg.port}/`);
-  console.log(`  Auction app    : http://localhost:${cfg.port}/app/`);
-  console.log(`  Admin console  : http://localhost:${cfg.port}/app/admin.html`);
-  console.log(`  API base       : http://localhost:${cfg.port}/api`);
-  console.log(`  Payment mode   : ${cfg.payments.provider}\n`);
-});
+// Boot: load persisted data, seed on first run, then start serving.
+(async () => {
+  await store.init();
+  seed();
+  // Settle finished auctions periodically (alongside lazy finalisation on reads).
+  setInterval(() => { try { finalizeDue(); } catch (e) { console.error(e); } }, 30000).unref();
+
+  server.listen(cfg.port, () => {
+    console.log(`\n  Valeria fundraiser + auction platform`);
+    console.log(`  ────────────────────────────────────`);
+    console.log(`  Marketing site : http://localhost:${cfg.port}/`);
+    console.log(`  Auction app    : http://localhost:${cfg.port}/app/`);
+    console.log(`  Admin console  : http://localhost:${cfg.port}/app/admin.html`);
+    console.log(`  API base       : http://localhost:${cfg.port}/api`);
+    console.log(`  Payment mode   : ${cfg.payments.provider}\n`);
+  });
+})();
