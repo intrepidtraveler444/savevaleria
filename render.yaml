@@ -1,0 +1,46 @@
+# Render blueprint for the Valeria auction backend.
+# ---------------------------------------------------------------------------
+# One-click deploy: push this project to GitHub, then on render.com choose
+# "New +" → "Blueprint" and point it at the repo. Render reads this file.
+# (You can also create the Web Service manually with the same settings.)
+# ---------------------------------------------------------------------------
+services:
+  - type: web
+    name: valeria-auction
+    runtime: node
+    plan: free                 # free = server sleeps when idle + EPHEMERAL disk
+    rootDir: server            # the backend lives in /server
+    buildCommand: ""           # no dependencies to install
+    startCommand: node index.js
+    healthCheckPath: /api/auctions
+    envVars:
+      - key: AUTH_SECRET
+        generateValue: true    # Render generates a strong random secret
+      - key: ADMIN_EMAIL
+        value: admin@example.com
+      - key: ADMIN_PASSWORD
+        sync: false            # set this yourself in the Render dashboard
+      - key: CORS_ORIGIN
+        sync: false            # set to your Netlify URL, e.g. https://valeria.netlify.app
+      # --- For real card payments (optional) ---
+      # - key: PAYMENT_PROVIDER
+      #   value: stripe
+      # - key: STRIPE_SECRET_KEY
+      #   sync: false
+
+# ---------------------------------------------------------------------------
+# PERSISTENCE (important): the free plan's disk is wiped on every restart/redeploy,
+# so donated items, bids, and accounts would reset. To keep data, upgrade to a paid
+# instance and attach a disk, then set DATA_DIR to its mount path. Uncomment:
+#
+#    plan: starter            # (replace `plan: free` above)
+#    disk:
+#      name: valeria-data
+#      mountPath: /var/data
+#      sizeGB: 1
+#    envVars:
+#      - key: DATA_DIR
+#        value: /var/data
+#
+# Alternatively, host the data in a managed database (see README §9).
+# ---------------------------------------------------------------------------

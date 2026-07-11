@@ -1,0 +1,15 @@
+{
+  "name": "valeria-auction-server",
+  "version": "1.0.0",
+  "description": "Backend for the Valeria fundraiser: online charity auction, payments, and admin. Zero runtime dependencies (Node.js built-ins only).",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "seed": "node seed.js",
+    "reset": "node -e \"require('fs').rmSync('./data',{recursive:true,force:true});console.log('data reset')\""
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

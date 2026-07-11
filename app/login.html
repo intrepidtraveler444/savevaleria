@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in · Valeria Auction</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💙</text></svg>" />
+  <link rel="stylesheet" href="css/auction-app.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+  <main class="page container">
+    <div class="form-card" style="max-width:440px">
+      <div class="tabs" role="tablist" aria-label="Sign in or create account">
+        <button class="active" data-tab="login" role="tab" aria-selected="true">Sign in</button>
+        <button data-tab="register" role="tab" aria-selected="false">Create account</button>
+      </div>
+
+      <div class="status" data-status role="alert" hidden></div>
+
+      <!-- Sign in -->
+      <form class="tabpanel active" data-panel="login" novalidate>
+        <div class="field">
+          <label for="li-email">Email <span class="req">*</span></label>
+          <input id="li-email" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="li-pass">Password <span class="req">*</span></label>
+          <input id="li-pass" type="password" autocomplete="current-password" required />
+        </div>
+        <button class="btn btn-accent btn-block btn-lg" type="submit">Sign in</button>
+        <p class="field-help center" style="margin-top:1rem">
+          Demo: <strong>bidder@example.com</strong> / password123 &nbsp;·&nbsp;
+          admin: <strong>admin@example.com</strong> / admin1234
+        </p>
+      </form>
+
+      <!-- Register -->
+      <form class="tabpanel" data-panel="register" novalidate>
+        <div class="field">
+          <label for="rg-name">Your name <span class="req">*</span></label>
+          <input id="rg-name" type="text" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="rg-email">Email <span class="req">*</span></label>
+          <input id="rg-email" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="rg-pass">Password <span class="req">*</span> <span class="opt">(min 8 characters)</span></label>
+          <input id="rg-pass" type="password" autocomplete="new-password" minlength="8" required />
+        </div>
+        <button class="btn btn-accent btn-block btn-lg" type="submit">Create account</button>
+        <p class="field-help center" style="margin-top:1rem">One account lets you donate items and bid.</p>
+      </form>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    App.init("");
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var next = params.get("next") || "dashboard.html";
+      var statusEl = document.querySelector("[data-status]");
+      function showStatus(state, msg) { statusEl.hidden = false; statusEl.setAttribute("data-state", state); statusEl.textContent = msg; }
+
+      // Tab switching
+      document.querySelectorAll(".tabs button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          document.querySelectorAll(".tabs button").forEach(function (x) { x.classList.remove("active"); x.setAttribute("aria-selected", "false"); });
+          b.classList.add("active"); b.setAttribute("aria-selected", "true");
+          document.querySelectorAll("[data-panel]").forEach(function (p) { p.classList.toggle("active", p.getAttribute("data-panel") === b.getAttribute("data-tab")); });
+          statusEl.hidden = true;
+        });
+      });
+
+      document.querySelector('[data-panel="login"]').addEventListener("submit", async function (e) {
+        e.preventDefault();
+        try {
+          await API.login(document.getElementById("li-email").value.trim(), document.getElementById("li-pass").value);
+          location.href = next;
+        } catch (err) { showStatus("error", err.message); }
+      });
+
+      document.querySelector('[data-panel="register"]').addEventListener("submit", async function (e) {
+        e.preventDefault();
+        try {
+          await API.register({
+            name: document.getElementById("rg-name").value.trim(),
+            email: document.getElementById("rg-email").value.trim(),
+            password: document.getElementById("rg-pass").value,
+          });
+          location.href = next;
+        } catch (err) { showStatus("error", err.message); }
+      });
+    })();
+  </script>
+</body>
+</html>

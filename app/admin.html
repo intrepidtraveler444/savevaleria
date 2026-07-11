@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin console · Valeria Auction</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💙</text></svg>" />
+  <link rel="stylesheet" href="css/auction-app.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+  <main class="page container">
+    <h1>Admin console</h1>
+
+    <!-- Fundraising statistics -->
+    <div class="stat-tiles" data-stats aria-label="Fundraising statistics"></div>
+
+    <div class="tabs" role="tablist">
+      <button class="active" data-tab="review" role="tab" aria-selected="true">Review queue</button>
+      <button data-tab="listings" role="tab" aria-selected="false">All listings</button>
+      <button data-tab="fulfilment" role="tab" aria-selected="false">Fulfilment</button>
+      <button data-tab="payments" role="tab" aria-selected="false">Payments</button>
+    </div>
+
+    <section class="tabpanel active" data-panel="review">
+      <p class="muted">New submissions awaiting approval. Set a starting bid and duration to publish.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Item</th><th>Donor</th><th>Est. value</th><th>Reserve</th><th>Setup</th><th>Actions</th></tr></thead>
+        <tbody data-review></tbody>
+      </table></div>
+    </section>
+
+    <section class="tabpanel" data-panel="listings">
+      <div class="filters"><div class="row">
+        <select data-status-filter aria-label="Filter by status">
+          <option value="all">All statuses</option>
+          <option value="live">Live</option><option value="pending">Pending</option>
+          <option value="won">Won</option><option value="paid">Paid</option>
+          <option value="unsold">Unsold</option><option value="rejected">Rejected</option>
+          <option value="shipped">Shipped</option><option value="collected">Collected</option>
+        </select>
+      </div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Item</th><th>Status</th><th>Current</th><th>Bids</th><th>Ends</th><th>Actions</th></tr></thead>
+        <tbody data-listings></tbody>
+      </table></div>
+    </section>
+
+    <section class="tabpanel" data-panel="fulfilment">
+      <p class="muted">Paid items to collect or ship, and any open disputes.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Item</th><th>Winner</th><th>Status</th><th>Collection</th><th>Actions</th></tr></thead>
+        <tbody data-fulfilment></tbody>
+      </table></div>
+    </section>
+
+    <section class="tabpanel" data-panel="payments">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Item</th><th>Bidder</th><th>Amount</th><th>Status</th><th>Provider</th><th>Date</th></tr></thead>
+        <tbody data-payments></tbody>
+      </table></div>
+    </section>
+  </main>
+
+  <!-- Lightweight modal for approve / edit / dispute -->
+  <dialog data-modal style="border:0;border-radius:14px;padding:0;max-width:480px;width:92vw"></dialog>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

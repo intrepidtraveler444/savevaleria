@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secure checkout · Valeria Auction</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💙</text></svg>" />
+  <link rel="stylesheet" href="css/auction-app.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+  <main class="page container">
+    <div class="form-card" style="max-width:480px">
+      <div class="status" data-state="info">
+        <strong>Demo checkout (mock mode).</strong> No real card is charged. In production
+        this screen is replaced by your secure payment provider (e.g. Stripe Checkout).
+        See the README "Payments" section.
+      </div>
+
+      <div data-checkout>
+        <h1 style="font-size:1.4rem">Complete your payment</h1>
+        <p class="muted">You're funding Valeria's care by paying your winning bid.</p>
+
+        <form data-pay novalidate>
+          <div class="field">
+            <label for="cc">Card number</label>
+            <input id="cc" inputmode="numeric" placeholder="4242 4242 4242 4242" value="4242 4242 4242 4242" />
+          </div>
+          <div class="two">
+            <div class="field"><label for="exp">Expiry</label><input id="exp" placeholder="12/29" value="12/29" /></div>
+            <div class="field"><label for="cvc">CVC</label><input id="cvc" placeholder="123" value="123" /></div>
+          </div>
+          <button class="btn btn-accent btn-block btn-lg" type="submit" data-paybtn>Pay now</button>
+        </form>
+      </div>
+
+      <div data-done hidden></div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    App.init("");
+    (function () {
+      if (!App.requireLogin()) return;
+      var params = new URLSearchParams(location.search);
+      var paymentId = params.get("payment");
+      var form = document.querySelector("[data-pay]");
+      var btn = document.querySelector("[data-paybtn]");
+      var done = document.querySelector("[data-done]");
+      var checkout = document.querySelector("[data-checkout]");
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        btn.setAttribute("aria-disabled", "true"); btn.textContent = "Processing…";
+        try {
+          var r = await API.post("/payments/confirm", { paymentId: paymentId });
+          var ins = r.instructions || {};
+          checkout.hidden = true; done.hidden = false;
+          done.innerHTML =
+            '<div class="status" data-state="success"><h3>Payment complete — thank you! 💙</h3>' +
+            '<p>Your winning bid helps fund Valeria\'s medical care.</p></div>' +
+            '<div class="collection"><h3>📦 How to collect your item</h3><dl class="dl">' +
+              (ins.location ? '<dt>Location</dt><dd>' + App.esc(ins.location) + '</dd>' : '') +
+              '<dt>Shipping</dt><dd>' + (ins.shippingAvailable ? 'Available' + (ins.shippingCost ? ' (' + App.money(ins.shippingCost) + ')' : '') : 'Collection only') + '</dd>' +
+              (ins.times ? '<dt>Availability</dt><dd>' + App.esc(ins.times) + '</dd>' : '') +
+              (ins.instructions ? '<dt>Instructions</dt><dd>' + App.esc(ins.instructions) + '</dd>' : '') +
+              (ins.donorName ? '<dt>Donor</dt><dd>' + App.esc(ins.donorName) + '</dd>' : '') +
+              (ins.donorEmail ? '<dt>Contact</dt><dd>' + App.esc(ins.donorEmail) + (ins.donorPhone ? ' · ' + App.esc(ins.donorPhone) : '') + '</dd>' : '') +
+              (ins.contactMethod ? '<dt>Preferred method</dt><dd>' + App.esc(ins.contactMethod) + '</dd>' : '') +
+            '</dl></div>' +
+            '<p style="margin-top:1rem"><a class="btn btn-ghost" href="dashboard.html">Back to my dashboard</a></p>';
+        } catch (err) {
+          btn.removeAttribute("aria-disabled"); btn.textContent = "Pay now";
+          App.toast(err.message, "error");
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

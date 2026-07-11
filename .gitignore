@@ -1,0 +1,10 @@
+# Runtime data (JSON store + uploaded photos) — never commit; regenerated/seeded.
+server/data/
+
+# Dependencies (there are none at runtime, but just in case)
+node_modules/
+
+# Logs / OS cruft
+*.log
+.DS_Store
+Thumbs.db

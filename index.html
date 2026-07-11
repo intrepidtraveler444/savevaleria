@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ===================================================================
+       SEO METADATA
+       Edit the title/description below to change how the page appears in
+       search results and browser tabs.
+       =================================================================== -->
+  <title>Help Valeria Recover — Emergency Fundraiser</title>
+  <meta name="description"
+        content="Valeria, 18, is fighting for her life in intensive care after a devastating car accident. ICU care costs around $4,000 a day. Please donate or share to help her family." />
+  <meta name="author" content="Valeria's family" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0e7490" />
+  <link rel="canonical" href="https://example.com/" /><!-- TODO: set your live URL -->
+
+  <!-- ===================================================================
+       OPEN GRAPH (Facebook, LinkedIn, WhatsApp previews)
+       Replace the og:url and og:image with your live domain + a real photo.
+       =================================================================== -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Help Valeria Recover After a Devastating Accident" />
+  <meta property="og:description"
+        content="Valeria, 18, is in a coma in the ICU after a car accident in Mexico. Her care costs roughly $4,000 a day. Every donation and share helps." />
+  <meta property="og:url" content="https://example.com/" /><!-- TODO: set your live URL -->
+  <meta property="og:image" content="https://example.com/images/og-image.jpg" /><!-- TODO: 1200x630 image -->
+  <meta property="og:image:alt" content="Support Valeria's recovery" />
+  <meta property="og:site_name" content="Help Valeria Recover" />
+
+  <!-- ===================================================================
+       TWITTER / X CARD
+       =================================================================== -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Help Valeria Recover After a Devastating Accident" />
+  <meta name="twitter:description"
+        content="Valeria, 18, is fighting for her life in the ICU. Care costs ~$4,000/day. Please donate or share." />
+  <meta name="twitter:image" content="https://example.com/images/og-image.jpg" /><!-- TODO -->
+
+  <!-- Favicon (emoji-based, no external file needed) -->
+  <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💙</text></svg>" />
+
+  <link rel="preconnect" href="https://www.gofundme.com" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <!-- Skip link for keyboard & screen-reader users -->
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- =====================================================================
+       HEADER — sticky, with a persistent Donate call-to-action
+       ===================================================================== -->
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="#top">
+        <span class="brand-heart" aria-hidden="true">💙</span>
+        <span class="brand-text">Help&nbsp;<strong data-bind="name">Valeria</strong></span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#story">Her Story</a>
+        <a href="#needs">The Need</a>
+        <a href="/app/">Auction</a>
+        <a href="#updates">Updates</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="btn btn-donate" data-bind="donate" href="#" target="_blank" rel="noopener">
+        Donate Now
+      </a>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ===================================================================
+         HERO
+         =================================================================== -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container hero-inner">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Urgent — every hour matters</p>
+          <h1 id="hero-heading">
+            <span data-bind="name">Valeria</span> is fighting for her life.
+            <span class="hero-accent">Help her come home.</span>
+          </h1>
+          <p class="hero-lede">
+            At just <span data-bind="age">18</span>, <span data-bind="name">Valeria</span>
+            is in a coma in intensive care after a devastating car accident. Her family
+            is facing overwhelming medical bills — roughly
+            <strong data-bind="dailyCost">$4,000</strong> every single day.
+            Your donation could be the difference.
+          </p>
+          <div class="hero-actions">
+            <!-- Donate Now remains the PRIMARY call-to-action -->
+            <a class="btn btn-donate btn-lg" data-bind="donate" href="#" target="_blank" rel="noopener">
+              Donate Now
+            </a>
+            <!-- Secondary CTA: donate an item to the charity auction -->
+            <a class="btn btn-ghost btn-lg" href="#auction">Donate an Auction Item</a>
+          </div>
+          <p class="hero-secondary-link"><a href="#story">Or read her story →</a></p>
+          <p class="hero-trust">
+            <span aria-hidden="true">🔒</span>
+            Donations are processed securely by GoFundMe and go directly to the family.
+          </p>
+        </div>
+
+        <div class="hero-media reveal">
+          <!-- Photo placeholder: add person.hero.image in js/config.js to replace -->
+          <figure class="hero-figure" data-bind="hero-figure">
+            <div class="photo-placeholder" role="img"
+                 aria-label="Photograph of Valeria will appear here">
+              <span aria-hidden="true">📷</span>
+              <p>Family photo coming soon</p>
+            </div>
+            <figcaption class="hero-caption">
+              <span data-bind="name">Valeria</span>, who dreams of
+              <span data-bind="dream">becoming a veterinarian</span>.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         PROGRESS — configurable goal & progress bar
+         =================================================================== -->
+    <section class="progress-section" aria-labelledby="progress-heading">
+      <div class="container">
+        <div class="progress-card reveal">
+          <h2 id="progress-heading" class="sr-only">Fundraising progress</h2>
+          <div class="progress-stats">
+            <div class="stat stat-raised">
+              <span class="stat-value" data-bind="raised">$0</span>
+              <span class="stat-label">raised of <span data-bind="goal">$35,000</span> goal</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" data-bind="donors">0</span>
+              <span class="stat-label">donations</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" data-bind="percent">0%</span>
+              <span class="stat-label">of goal reached</span>
+            </div>
+          </div>
+
+          <div class="progress-bar" role="progressbar"
+               aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+               aria-label="Percentage of fundraising goal reached"
+               data-bind="progressbar">
+            <div class="progress-fill" data-bind="progressfill"></div>
+          </div>
+
+          <p class="progress-meta">
+            Last updated <span data-bind="lastUpdated">—</span>. Live totals are shown on GoFundMe.
+          </p>
+          <a class="btn btn-donate btn-block" data-bind="donate" href="#" target="_blank" rel="noopener">
+            Donate Now
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         HER STORY
+         =================================================================== -->
+    <section class="section" id="story" aria-labelledby="story-heading">
+      <div class="container narrow">
+        <p class="eyebrow reveal">Her story</p>
+        <h2 id="story-heading" class="reveal">A bright future, interrupted in an instant</h2>
+        <div class="prose reveal">
+          <p>
+            <span data-bind="name">Valeria</span> had just turned
+            <span data-bind="age">18</span>. Like so many young people on the edge of
+            adulthood, she was full of plans — chief among them, a dream of
+            <span data-bind="dream">becoming a veterinarian</span> and caring for animals.
+          </p>
+          <p>
+            On <strong>3 July</strong>, everything changed. While travelling in
+            <strong>San&nbsp;Miguel de Allende, Mexico</strong>, another vehicle veered
+            her off the road. The crash left her with devastating injuries: a
+            <strong>brain contusion</strong>, a <strong>jaw fractured in multiple places</strong>,
+            and a <strong>punctured lung</strong>.
+          </p>
+          <p>
+            Today, <span data-bind="name">Valeria</span> lies in a coma in the intensive
+            care unit, fighting for her life. Her family is by her side — and now they are
+            asking for help to keep her there, and to give her the chance to recover and
+            chase the future she was working so hard for.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         MEDICAL & FINANCIAL NEEDS  (highlights ~$4,000/day)
+         =================================================================== -->
+    <section class="section section-alt" id="needs" aria-labelledby="needs-heading">
+      <div class="container">
+        <p class="eyebrow reveal">The need</p>
+        <h2 id="needs-heading" class="reveal">Why help is needed right now</h2>
+        <p class="section-lede reveal">
+          Intensive care is relentless — and relentlessly expensive. Every day
+          <span data-bind="name">Valeria</span> spends in the ICU adds to a bill her
+          family cannot carry alone.
+        </p>
+
+        <div class="cost-highlight reveal">
+          <span class="cost-figure" data-bind="dailyCost">$4,000</span>
+          <span class="cost-caption">
+            approximate cost of hospital &amp; ICU care <strong>per&nbsp;day</strong>
+          </span>
+        </div>
+
+        <ul class="needs-grid reveal" aria-label="What the funds cover">
+          <li class="need-card">
+            <span class="need-icon" aria-hidden="true">🏥</span>
+            <h3>Intensive care</h3>
+            <p>Round-the-clock ICU monitoring and life support while she is in a coma.</p>
+          </li>
+          <li class="need-card">
+            <span class="need-icon" aria-hidden="true">⚕️</span>
+            <h3>Emergency surgery</h3>
+            <p>Urgent operations to treat her brain, lung, and multiple jaw fractures.</p>
+          </li>
+          <li class="need-card">
+            <span class="need-icon" aria-hidden="true">🧑‍⚕️</span>
+            <h3>Facial reconstruction</h3>
+            <p>Specialist reconstructive surgery to repair the damage to her face and jaw.</p>
+          </li>
+          <li class="need-card">
+            <span class="need-icon" aria-hidden="true">💪</span>
+            <h3>Rehabilitation</h3>
+            <p>The long road of recovery and therapy that will follow her time in the ICU.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         HOW DONATIONS HELP
+         =================================================================== -->
+    <section class="section" id="help" aria-labelledby="help-heading">
+      <div class="container">
+        <p class="eyebrow reveal">How donations help</p>
+        <h2 id="help-heading" class="reveal">Where your kindness goes</h2>
+        <div class="steps reveal">
+          <div class="step">
+            <span class="step-num">1</span>
+            <h3>You give securely</h3>
+            <p>Donate any amount through the family's verified GoFundMe. GoFundMe handles payment safely.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">2</span>
+            <h3>Funds reach the family</h3>
+            <p>Money goes directly to <span data-bind="organiser">Valeria's sister</span> to pay for care.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">3</span>
+            <h3>Valeria gets a chance</h3>
+            <p>Every dollar buys more time, more treatment, and more hope for her recovery.</p>
+          </div>
+        </div>
+        <div class="center reveal">
+          <a class="btn btn-donate btn-lg" data-bind="donate" href="#" target="_blank" rel="noopener">
+            Donate Now
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         CHARITY AUCTION — collect item donations now; live bidding later.
+         Rendered/handled by js/auction.js using CAMPAIGN_CONFIG.auction.
+         =================================================================== -->
+    <section class="section section-auction" id="auction" aria-labelledby="auction-heading"
+             data-bind="auction-section">
+      <div class="container">
+        <p class="eyebrow reveal">Charity auction</p>
+        <h2 id="auction-heading" class="reveal">Donate an item, help fund her recovery</h2>
+        <p class="section-lede reveal">
+          Alongside direct donations, we're running an online charity auction. Individuals
+          and businesses can donate an item or experience — supporters then bid on it, and
+          <strong>100% of the proceeds go towards <span data-bind="name">Valeria</span>'s
+          medical care</strong>. It's a chance to give something you can spare and turn it
+          into real help.
+        </p>
+
+        <!-- Entry points into the live auction application -->
+        <div class="hero-actions reveal" style="margin-bottom:2.5rem">
+          <a class="btn btn-ghost btn-lg" href="/app/">🔨 Browse the live auction</a>
+          <a class="btn btn-ghost btn-lg" href="/app/submit.html">🎁 Donate an item online</a>
+        </div>
+
+        <!-- How auction items help -->
+        <ul class="needs-grid reveal" aria-label="How donated auction items help">
+          <li class="need-card">
+            <span class="need-icon" aria-hidden="true">🎁</span>
+            <h3>Turn goods into care</h3>
+            <p>An item you donate becomes cash for ICU care, surgery, and rehabilitation.</p>
+          </li>
+          <li class="need-card">
+            <span class="need-icon" aria-hidden="true">🤝</span>
+            <h3>A way for businesses to help</h3>
+            <p>Companies can donate products, services, or experiences and reach a caring audience.</p>
+          </li>
+          <li class="need-card">
+            <span class="need-icon" aria-hidden="true">📈</span>
+            <h3>Bidding lifts every gift</h3>
+            <p>Supporters compete to give more, so each item can raise well above its value.</p>
+          </li>
+        </ul>
+
+        <!-- How the auction works (process steps from config) -->
+        <h3 class="auction-subhead reveal">How the auction works</h3>
+        <ol class="auction-process reveal" data-bind="auction-process" aria-label="Auction process steps">
+          <!-- Steps injected by js/auction.js -->
+        </ol>
+
+        <!-- ---------------- Item donation form ---------------- -->
+        <div class="auction-form-wrap reveal" id="donate-item">
+          <div class="auction-form-head">
+            <h3>Donate an auction item</h3>
+            <p>Fill in the details below. Fields marked <span class="req" aria-hidden="true">*</span>
+               are required. We'll email you to confirm before anything is listed.</p>
+          </div>
+
+          <!-- Live region for form-level success / error messages -->
+          <div class="form-status" data-bind="form-status" role="status" aria-live="polite" hidden></div>
+
+          <form class="auction-form" data-bind="auction-form" novalidate>
+            <div class="form-grid">
+
+              <div class="field">
+                <label for="af-name">Your name <span class="req" aria-hidden="true">*</span></label>
+                <input id="af-name" name="donorName" type="text" autocomplete="name"
+                       required aria-required="true" aria-describedby="af-name-err" />
+                <p class="field-error" id="af-name-err" data-error hidden></p>
+              </div>
+
+              <div class="field">
+                <label for="af-email">Email address <span class="req" aria-hidden="true">*</span></label>
+                <input id="af-email" name="email" type="email" autocomplete="email"
+                       inputmode="email" required aria-required="true" aria-describedby="af-email-err" />
+                <p class="field-error" id="af-email-err" data-error hidden></p>
+              </div>
+
+              <div class="field">
+                <label for="af-phone">Phone number <span class="opt">(optional)</span></label>
+                <input id="af-phone" name="phone" type="tel" autocomplete="tel"
+                       aria-describedby="af-phone-err" />
+                <p class="field-error" id="af-phone-err" data-error hidden></p>
+              </div>
+
+              <div class="field">
+                <label for="af-category">Item category <span class="req" aria-hidden="true">*</span></label>
+                <select id="af-category" name="category" required aria-required="true"
+                        aria-describedby="af-category-err" data-bind="category-options">
+                  <option value="" selected disabled>Choose a category…</option>
+                  <!-- Options injected from config -->
+                </select>
+                <p class="field-error" id="af-category-err" data-error hidden></p>
+              </div>
+
+              <div class="field field-full">
+                <label for="af-title">Item or experience title <span class="req" aria-hidden="true">*</span></label>
+                <input id="af-title" name="itemTitle" type="text" maxlength="120"
+                       placeholder="e.g. Weekend stay for two, signed guitar, portrait session"
+                       required aria-required="true" aria-describedby="af-title-err" />
+                <p class="field-error" id="af-title-err" data-error hidden></p>
+              </div>
+
+              <div class="field field-full">
+                <label for="af-desc">Detailed description <span class="req" aria-hidden="true">*</span></label>
+                <textarea id="af-desc" name="description" rows="4" maxlength="1500"
+                          placeholder="Describe the item or experience, its condition, and anything a bidder should know."
+                          required aria-required="true" aria-describedby="af-desc-err"></textarea>
+                <p class="field-error" id="af-desc-err" data-error hidden></p>
+              </div>
+
+              <div class="field">
+                <label for="af-value">Estimated market value (USD) <span class="req" aria-hidden="true">*</span></label>
+                <div class="input-prefix">
+                  <span aria-hidden="true">$</span>
+                  <input id="af-value" name="estimatedValue" type="number" min="1" step="1"
+                         inputmode="numeric" placeholder="150"
+                         required aria-required="true" aria-describedby="af-value-err" />
+                </div>
+                <p class="field-error" id="af-value-err" data-error hidden></p>
+              </div>
+
+              <div class="field">
+                <label for="af-photos">Photos <span class="opt">(optional, up to <span data-bind="max-photos">8</span>)</span></label>
+                <input id="af-photos" name="photos" type="file" accept="image/*" multiple
+                       aria-describedby="af-photos-help af-photos-err" />
+                <p class="field-help" id="af-photos-help">JPG, PNG or WebP. Clear photos help items sell for more.</p>
+                <ul class="photo-previews" data-bind="photo-previews" aria-label="Selected photos"></ul>
+                <p class="field-error" id="af-photos-err" data-error hidden></p>
+              </div>
+
+              <div class="field field-full">
+                <label for="af-collection">Collection or delivery details <span class="req" aria-hidden="true">*</span></label>
+                <textarea id="af-collection" name="collection" rows="2" maxlength="500"
+                          placeholder="e.g. Can drop off in Austin, TX; happy to post at your cost; digital item sent by email."
+                          required aria-required="true" aria-describedby="af-collection-err"></textarea>
+                <p class="field-error" id="af-collection-err" data-error hidden></p>
+              </div>
+
+              <div class="field field-full">
+                <label for="af-notes">Additional notes <span class="opt">(optional)</span></label>
+                <textarea id="af-notes" name="notes" rows="2" maxlength="500"
+                          placeholder="Anything else we should know?"></textarea>
+              </div>
+
+              <div class="field field-full field-consent">
+                <label class="checkbox">
+                  <input id="af-consent" name="consent" type="checkbox"
+                         required aria-required="true" aria-describedby="af-consent-err" />
+                  <span>I confirm I own this item (or am authorised to donate it) and that
+                        it can be given to the charity auction. <span class="req" aria-hidden="true">*</span></span>
+                </label>
+                <p class="field-error" id="af-consent-err" data-error hidden></p>
+              </div>
+
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-donate btn-lg" data-bind="submit-btn">
+                Submit auction item
+              </button>
+              <a class="btn btn-ghost" data-bind="donate" href="#" target="_blank" rel="noopener">
+                Prefer to donate money?
+              </a>
+            </div>
+            <p class="form-privacy">
+              Your details are used only to arrange your donation and are never sold or shared.
+            </p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         SHARE
+         =================================================================== -->
+    <section class="section section-share" aria-labelledby="share-heading">
+      <div class="container narrow center">
+        <h2 id="share-heading" class="reveal">Can't donate? Sharing helps just as much.</h2>
+        <p class="section-lede reveal">
+          The more people who see <span data-bind="name">Valeria</span>'s story, the closer
+          she gets to the care she needs. Please share this page.
+        </p>
+        <div class="share-buttons reveal" data-bind="share" aria-label="Share this campaign">
+          <!-- Buttons are generated by js/main.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         UPDATES  (rendered from config; add entries there)
+         =================================================================== -->
+    <section class="section section-alt" id="updates" aria-labelledby="updates-heading">
+      <div class="container narrow">
+        <p class="eyebrow reveal">Updates</p>
+        <h2 id="updates-heading" class="reveal">Latest news on Valeria</h2>
+        <p class="section-lede reveal">
+          We'll post updates here as we have them. Newest first.
+        </p>
+        <ol class="timeline" data-bind="updates" aria-label="Campaign updates">
+          <!-- Timeline entries are generated by js/main.js -->
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         FAQ  (accessible accordion, rendered from config)
+         =================================================================== -->
+    <section class="section" id="faq" aria-labelledby="faq-heading">
+      <div class="container narrow">
+        <p class="eyebrow reveal">Questions</p>
+        <h2 id="faq-heading" class="reveal">Frequently asked questions</h2>
+        <div class="faq-list" data-bind="faqs">
+          <!-- FAQ items are generated by js/main.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         CONTACT
+         =================================================================== -->
+    <section class="section section-alt" id="contact" aria-labelledby="contact-heading">
+      <div class="container narrow">
+        <p class="eyebrow reveal">Contact</p>
+        <h2 id="contact-heading" class="reveal">Get in touch</h2>
+        <div class="contact-card reveal">
+          <p data-bind="contact-note"></p>
+          <ul class="contact-list" data-bind="contact-list">
+            <!-- Contact rows generated by js/main.js when details are provided -->
+          </ul>
+          <p class="contact-organiser">
+            Campaign organised by <strong data-bind="organiserName">Sammy Deloera</strong>
+            <span data-bind="organiserLocation"></span>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================
+       FOOTER
+       =================================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-brand">
+        <span aria-hidden="true">💙</span> Help <span data-bind="name">Valeria</span> Recover
+      </p>
+      <a class="btn btn-donate" data-bind="donate" href="#" target="_blank" rel="noopener">Donate Now</a>
+      <p class="footer-note">
+        This page was created to support Valeria's family. All donations are made
+        through their official GoFundMe. Details are based only on information shared
+        publicly by the family.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Sticky mobile donate bar -->
+  <div class="mobile-donate" aria-hidden="false">
+    <a class="btn btn-donate btn-block" data-bind="donate" href="#" target="_blank" rel="noopener">
+      💙 Donate Now
+    </a>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/auction.js"></script>
+</body>
+</html>

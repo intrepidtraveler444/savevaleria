@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donate an item · Help Valeria Recover</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💙</text></svg>" />
+  <link rel="stylesheet" href="css/auction-app.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <section class="app-hero">
+    <div class="container">
+      <h1>Donate an item or experience</h1>
+      <p>List something for the charity auction in a few quick steps. Our team reviews every
+         submission before it goes live, then you can track it from your dashboard.</p>
+    </div>
+  </section>
+
+  <main class="page container">
+    <form class="form-card" data-wizard novalidate>
+      <div class="steps-head" aria-hidden="true">
+        <div class="s active" data-step-label="0">1 · Item</div>
+        <div class="s" data-step-label="1">2 · Photos</div>
+        <div class="s" data-step-label="2">3 · Collection</div>
+        <div class="s" data-step-label="3">4 · Review</div>
+      </div>
+
+      <div class="status" data-status role="alert" hidden></div>
+
+      <!-- Step 1: item -->
+      <fieldset class="wizard-step active" data-step="0">
+        <legend class="sr-only">Item details</legend>
+        <div class="field">
+          <label for="w-title">Item or experience title <span class="req">*</span></label>
+          <input id="w-title" name="title" type="text" maxlength="120" required
+                 placeholder="e.g. Weekend stay for two, signed guitar, portrait session" />
+          <p class="field-error" data-err="title" hidden></p>
+        </div>
+        <div class="field">
+          <label for="w-category">Category <span class="req">*</span></label>
+          <select id="w-category" name="category" required><option value="" disabled selected>Choose a category…</option></select>
+          <p class="field-error" data-err="category" hidden></p>
+        </div>
+        <div class="field">
+          <label for="w-desc">Detailed description <span class="req">*</span></label>
+          <textarea id="w-desc" name="description" rows="4" maxlength="2000" required
+                    placeholder="Describe the item, its condition, and anything a bidder should know."></textarea>
+          <p class="field-error" data-err="description" hidden></p>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="w-condition">Condition <span class="opt">(if applicable)</span></label>
+            <select id="w-condition" name="condition">
+              <option value="">Not applicable</option>
+              <option>New</option><option>Like new</option><option>Good</option><option>Fair</option><option>For parts</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="w-value">Estimated value (USD) <span class="req">*</span></label>
+            <input id="w-value" name="estimatedValue" type="number" min="1" step="1" inputmode="numeric" required placeholder="150" />
+            <p class="field-error" data-err="estimatedValue" hidden></p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="w-reserve">Reserve price <span class="opt">(optional — minimum you'll accept)</span></label>
+          <input id="w-reserve" name="reservePrice" type="number" min="1" step="1" inputmode="numeric" placeholder="Leave blank for no reserve" />
+          <p class="field-help">If bidding doesn't reach the reserve, the item won't sell. Kept private from bidders.</p>
+          <p class="field-error" data-err="reservePrice" hidden></p>
+        </div>
+      </fieldset>
+
+      <!-- Step 2: photos -->
+      <fieldset class="wizard-step" data-step="1">
+        <legend class="sr-only">Photos</legend>
+        <div class="field">
+          <label>Photos <span class="opt">(up to 8 — drag & drop or click)</span></label>
+          <div class="dropzone" data-dropzone tabindex="0" role="button" aria-label="Add photos">
+            <input type="file" accept="image/*" multiple data-file />
+            <div>📷 <strong>Drag photos here</strong> or click to browse<br>
+              <span class="field-help">JPG, PNG or WebP · max 5MB each. Clear photos sell for more.</span></div>
+          </div>
+          <ul class="thumbs" data-thumbs></ul>
+          <p class="field-help">Photos are optional but strongly recommended.</p>
+        </div>
+      </fieldset>
+
+      <!-- Step 3: collection -->
+      <fieldset class="wizard-step" data-step="2">
+        <legend class="sr-only">Collection and delivery</legend>
+        <div class="field">
+          <label for="w-loc">Collection address or general location <span class="req">*</span></label>
+          <input id="w-loc" name="location" type="text" maxlength="200" required placeholder="e.g. Austin, TX (exact address shared with winner)" />
+          <p class="field-error" data-err="collection" hidden></p>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label class="checkbox"><input type="checkbox" data-shipping /> <span>Shipping is available</span></label>
+          </div>
+          <div class="field" data-shipcost hidden>
+            <label for="w-shipcost">Shipping cost (USD) <span class="opt">(0 for free)</span></label>
+            <input id="w-shipcost" name="shippingCost" type="number" min="0" step="1" inputmode="numeric" placeholder="0" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="w-times">Collection times or availability</label>
+          <input id="w-times" name="times" type="text" maxlength="300" placeholder="e.g. Weekends, or by appointment" />
+        </div>
+        <div class="field">
+          <label for="w-instr">Special collection instructions</label>
+          <textarea id="w-instr" name="instructions" rows="2" maxlength="500" placeholder="Anything the winner should know about collecting the item."></textarea>
+        </div>
+        <div class="field">
+          <label for="w-contact-method">Preferred contact method after the auction <span class="req">*</span></label>
+          <input id="w-contact-method" name="contactMethod" type="text" maxlength="200" required placeholder="e.g. Email, phone/text, WhatsApp" />
+          <p class="field-error" data-err="contactMethod" hidden></p>
+        </div>
+      </fieldset>
+
+      <!-- Step 4: review -->
+      <fieldset class="wizard-step" data-step="3">
+        <legend class="sr-only">Your details and review</legend>
+        <div class="two">
+          <div class="field">
+            <label for="w-cname">Your name <span class="opt">(defaults to your account)</span></label>
+            <input id="w-cname" name="contactName" type="text" maxlength="120" />
+          </div>
+          <div class="field">
+            <label for="w-cphone">Phone <span class="opt">(optional)</span></label>
+            <input id="w-cphone" name="contactPhone" type="tel" maxlength="60" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="w-notes">Additional notes to the team <span class="opt">(optional)</span></label>
+          <textarea id="w-notes" name="notes" rows="2" maxlength="500"></textarea>
+        </div>
+        <div class="field field-consent">
+          <label class="checkbox"><input type="checkbox" data-consent required />
+            <span>I confirm I own this item (or am authorised to donate it) and can hand it over if it sells. <span class="req">*</span></span></label>
+          <p class="field-error" data-err="consent" hidden></p>
+        </div>
+        <div class="panel" data-review></div>
+      </fieldset>
+
+      <div class="wizard-actions">
+        <button type="button" class="btn btn-ghost" data-prev hidden>← Back</button>
+        <span style="flex:1"></span>
+        <button type="button" class="btn btn-accent" data-next>Next →</button>
+        <button type="submit" class="btn btn-accent btn-lg" data-submit hidden>Submit for review</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/submit.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Charity Auction · Help Valeria Recover</title>
+  <meta name="description" content="Bid on donated items and experiences. 100% of proceeds help fund Valeria's medical care." />
+  <meta property="og:title" content="Charity Auction — Help Valeria Recover" />
+  <meta property="og:description" content="Bid on donated items and experiences to help fund Valeria's care." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💙</text></svg>" />
+  <link rel="stylesheet" href="css/auction-app.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <section class="app-hero">
+    <div class="container">
+      <span class="badge badge-live">100% to Valeria's care</span>
+      <h1>Charity Auction</h1>
+      <p>Bid on items and experiences donated by our community. Every winning bid goes
+         straight towards Valeria's hospital and recovery costs. Prefer to give directly?
+         The <strong>Donate Now</strong> button up top always takes you to the GoFundMe.</p>
+    </div>
+  </section>
+
+  <main class="page container">
+    <!-- Filters -->
+    <div class="filters">
+      <div class="row">
+        <input class="search" type="search" data-search placeholder="Search items and experiences…" aria-label="Search auctions" />
+        <select data-sort aria-label="Sort by">
+          <option value="ending">Ending soonest</option>
+          <option value="newest">Newest</option>
+          <option value="price-high">Highest bid</option>
+          <option value="price-low">Lowest bid</option>
+          <option value="most-bids">Most bids</option>
+        </select>
+      </div>
+      <div class="chips" data-categories aria-label="Filter by category"></div>
+    </div>
+
+    <div class="grid" data-results aria-live="polite">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/browse.js"></script>
+</body>
+</html>

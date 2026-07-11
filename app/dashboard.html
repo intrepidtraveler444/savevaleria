@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My dashboard · Valeria Auction</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💙</text></svg>" />
+  <link rel="stylesheet" href="css/auction-app.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+  <main class="page container">
+    <h1>My dashboard</h1>
+    <div class="status" data-status role="status" hidden></div>
+
+    <div class="tabs" role="tablist">
+      <button class="active" data-tab="bids" role="tab" aria-selected="true">Auctions I'm bidding on</button>
+      <button data-tab="items" role="tab" aria-selected="false">Items I've donated</button>
+    </div>
+
+    <section class="tabpanel active" data-panel="bids" aria-label="My bids">
+      <div data-bids><div class="skeleton" style="height:120px"></div></div>
+    </section>
+
+    <section class="tabpanel" data-panel="items" aria-label="My donated items">
+      <p><a class="btn btn-ghost" href="submit.html">+ Donate another item</a></p>
+      <div data-items><div class="skeleton" style="height:120px"></div></div>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
