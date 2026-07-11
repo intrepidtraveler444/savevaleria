@@ -10,37 +10,30 @@ Already set up for you:
 
 ---
 
-## Part 1 — One-time setup (~15 minutes, free)
+## Part 1 — One-time setup (~5 minutes, free)
 
-You'll do this once. Everything below is free and needs no credit card.
+Most of the setup is already done for you. Just two quick things below.
+
+> ✅ **Permanent data storage is already switched on.** Your auction saves everything
+> (items, bids, accounts) to a free cloud database, so nothing is lost when the server
+> is quiet or restarts. You don't need to do anything for this — it's handled.
 
 ### 1. Get your admin login
-Ask the person who set this up for the **admin email and password** (set on Render as
-`ADMIN_EMAIL` / `ADMIN_PASSWORD`). Sign in at the admin console link above.
+Ask the person who set this up for the **admin email and password**. Sign in at the admin
+console link above.
 
 To add more admins (e.g. both parents):
 1. The other person creates a normal account on the site (**Sign in → Create account**).
 2. You open **Admin → Team**, find their name, and click **Make admin**.
 
-### 2. Turn on permanent data storage (important — free)
-Without this, the auction forgets everything when it's quiet for a while. To fix it:
-
-1. Go to **https://upstash.com** and sign up (free, no card). Click **Create Database**
-   (Redis). Any name/region is fine.
-2. On the database page, find the **REST API** section. Copy the two values:
-   **`UPSTASH_REDIS_REST_URL`** and **`UPSTASH_REDIS_REST_TOKEN`**.
-3. Go to your **Render dashboard → the `valeria-auction` service → Environment**.
-   Add two variables with those exact names and paste the values. Click **Save**.
-   Render restarts, and your data now sticks. ✅
-
-### 3. Keep the auction awake so it ends on time (free)
-The free server "sleeps" when no one's visiting, which can delay auctions ending.
-A free pinger keeps it awake:
+### 2. Keep the auction awake so it ends on time (free, recommended)
+The free server "sleeps" when no one's visiting, which can delay auctions from ending and
+make the first visit slow. A free pinger keeps it awake:
 
 1. Go to **https://cron-job.org** (free) and sign up.
 2. Create a cronjob that requests
    **`https://valeria-auction.onrender.com/api/auctions`** every **10 minutes**.
-That's it — the auction now stays responsive and ends on schedule.
+That's it — the auction stays responsive and ends on schedule.
 
 > **Emails (optional, later):** winners/bidders currently get messages **inside the
 > site** (they see them when they log in). To also email people, you need a domain
@@ -55,8 +48,10 @@ Everything happens in the **Admin console**: https://savevaleria.netlify.app/app
 
 ### Accepting items people offer
 - People submit items at **/app/submit.html**. New ones appear in your **Review queue**.
-- For each: set a **starting bid** and how many **hours** it should run, then **Approve**
-  (or **Reject** with a reason). Approved items go live for bidding immediately.
+- For each: set a **starting bid** and the **auction length in hours** — this is already
+  **pre-filled with the length the donor asked for** (hover it to see their preference in
+  days), so just adjust it if you like. Then **Approve** (or **Reject** with a reason).
+  Approved items go live for bidding immediately.
 
 ### When an auction ends and someone wins
 1. The winner is asked to **pay their winning bid on your GoFundMe** (so the money goes
