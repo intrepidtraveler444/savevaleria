@@ -14,13 +14,20 @@ const ROOT = path.join(__dirname, "..");
 // (e.g. a Render disk mounted at /var/data) so data survives restarts/redeploys.
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
 
+// Sanitise the CORS origin: strip any non-printable characters (a stray newline
+// from a pasted env var would otherwise crash setHeader), trim whitespace, drop a
+// trailing slash, and fall back to "*" if that leaves it empty. A bad value must
+// never take the server down.
+const CORS_ORIGIN =
+  ((process.env.CORS_ORIGIN || "*").replace(/[^\x20-\x7E]/g, "").trim().replace(/\/+$/, "")) || "*";
+
 module.exports = {
   port: Number(process.env.PORT) || 4000,
 
   // Cross-origin: when the static site is hosted separately (Netlify) and the API
   // on another domain (Render), the browser needs this. "*" is safe here because
   // auth uses bearer tokens, not cookies. Restrict to your site's URL if you like.
-  cors: { origin: process.env.CORS_ORIGIN || "*" },
+  cors: { origin: CORS_ORIGIN },
 
   // Where the JSON database and uploaded photos live.
   paths: {
