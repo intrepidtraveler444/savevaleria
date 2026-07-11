@@ -36,6 +36,17 @@ module.exports = {
     cacheMinutes: Number(process.env.GOFUNDME_CACHE_MINUTES) || 10,
   },
 
+  // Email notifications (Resend). Leave RESEND_API_KEY unset to keep emails off
+  // (notifications still appear in-app). See README "Emails" for setup.
+  //   RESEND_API_KEY — from resend.com
+  //   EMAIL_FROM     — a verified sender, e.g. "Valeria Auction <auction@yourdomain.org>"
+  //   SITE_URL       — your public site, used for links in emails
+  email: {
+    resendApiKey: process.env.RESEND_API_KEY || "",
+    from: process.env.EMAIL_FROM || "Valeria Auction <onboarding@resend.dev>",
+    siteUrl: process.env.SITE_URL || "https://savevaleria.netlify.app",
+  },
+
   // Where the JSON database and uploaded photos live.
   paths: {
     root: ROOT,
@@ -68,12 +79,18 @@ module.exports = {
     minIncrement: 1,                  // minimum bid increment (USD)
   },
 
-  // Payment provider: "mock" (local, no keys) or "stripe" (see lib/payments.js).
+  // Payment model:
+  //   "gofundme" (default) — winners pay their bid on the GoFundMe page; an admin
+  //                          confirms receipt. All money flows into the campaign.
+  //   "mock"              — local testing, auto-confirms, no real money.
+  //   "stripe"            — real card checkout (see lib/payments.js).
   payments: {
-    provider: process.env.PAYMENT_PROVIDER || "mock",
+    provider: process.env.PAYMENT_PROVIDER || "gofundme",
     currency: "usd",
-    // Public link donors/winners are directed to so proceeds reach the campaign.
-    gofundmeUrl: "https://gofund.me/4c46c9477",
+    // Public campaign link (short) and the direct donate page winners are sent to.
+    gofundmeUrl: process.env.GOFUNDME_URL || "https://gofund.me/4c46c9477",
+    gofundmeDonateUrl: process.env.GOFUNDME_DONATE_URL ||
+      "https://www.gofundme.com/f/help-valeria-recover-after-devastating-accident/donate",
     stripe: {
       secretKey: process.env.STRIPE_SECRET_KEY || "",
       // Where Stripe redirects after checkout (set to your deployed URLs).

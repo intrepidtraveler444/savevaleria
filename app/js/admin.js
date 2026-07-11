@@ -25,7 +25,7 @@
       var tile = function (v, l) { return '<div class="tile"><div class="v">' + v + '</div><div class="l">' + l + '</div></div>'; };
       document.querySelector("[data-stats]").innerHTML =
         tile(App.money(d.totalRaised), "Raised via auction") +
-        tile(App.money(d.awaitingPayment), "Awaiting payment") +
+        tile(d.awaitingConfirmation || 0, "Payments to confirm") +
         tile(d.liveAuctions, "Live auctions") +
         tile(d.pendingReview, "Pending review") +
         tile(d.totalBids, "Total bids") +
@@ -126,14 +126,68 @@
   async function loadPayments() {
     var tb = document.querySelector("[data-payments]");
     var d = await API.get("/admin/payments");
+    // Show payments awaiting confirmation first.
+    d.payments.sort(function (a, b) { return (a.status === "submitted" ? -1 : 0) - (b.status === "submitted" ? -1 : 0); });
     tb.innerHTML = d.payments.length ? d.payments.map(function (p) {
+      var statusLabel = p.status === "paid" ? '<span class="badge badge-paid">paid</span>'
+        : p.status === "submitted" ? '<span class="badge badge-pending">awaiting confirmation</span>'
+        : '<span class="badge badge-unsold">' + App.esc(p.status) + '</span>';
+      var actions = p.status === "submitted"
+        ? '<button class="btn-xs ok" data-confirm="' + p.id + '">Confirm received</button>' +
+          '<button class="btn-xs danger" data-reject-pay="' + p.id + '">Reject</button>'
+        : (p.status === "paid" ? '<span class="muted">✓</span>' : '<span class="muted">—</span>');
       return '<tr><td>' + App.esc(p.itemTitle) + '</td>' +
-        '<td>' + App.esc(p.bidder ? p.bidder.name : "—") + '</td>' +
+        '<td>' + App.esc(p.bidder ? p.bidder.name : "—") +
+          (p.bidder ? '<br><span class="muted">' + App.esc(p.bidder.email) + '</span>' : "") + '</td>' +
         '<td>' + App.money(p.amount) + '</td>' +
-        '<td>' + badge(p.status === "paid" ? "paid" : "pending") + '</td>' +
-        '<td>' + App.esc(p.provider || "—") + '</td>' +
-        '<td>' + new Date(p.createdAt).toLocaleDateString() + '</td></tr>';
+        '<td>' + statusLabel + '</td>' +
+        '<td>' + new Date(p.createdAt).toLocaleDateString() + '</td>' +
+        '<td><div class="actions">' + actions + '</div></td></tr>';
     }).join("") : '<tr><td colspan="6" class="muted">No payments yet.</td></tr>';
+
+    tb.querySelectorAll("[data-confirm]").forEach(function (b) {
+      b.addEventListener("click", async function () {
+        try { await API.post("/admin/payments/" + b.getAttribute("data-confirm") + "/confirm", {}); App.toast("Payment confirmed — buyer notified with collection details.", "success"); refresh(); }
+        catch (e) { App.toast(e.message, "error"); }
+      });
+    });
+    tb.querySelectorAll("[data-reject-pay]").forEach(function (b) {
+      b.addEventListener("click", async function () {
+        var reason = prompt("Reason (shared with the bidder):", "We couldn't find a matching GoFundMe donation. Please check the amount and try again.");
+        if (reason === null) return;
+        try { await API.post("/admin/payments/" + b.getAttribute("data-reject-pay") + "/reject", { reason: reason }); App.toast("Payment rejected — bidder asked to retry.", "info"); refresh(); }
+        catch (e) { App.toast(e.message, "error"); }
+      });
+    });
+  }
+
+  /* ---- team / admins ---- */
+  async function loadUsers() {
+    var tb = document.querySelector("[data-users]");
+    if (!tb) return;
+    var me = App.currentUser();
+    var d = await API.get("/admin/users");
+    tb.innerHTML = d.users.map(function (u) {
+      var isMe = me && u.id === me.id;
+      var action = u.role === "admin"
+        ? (isMe ? '<span class="muted">you</span>' : '<button class="btn-xs" data-demote="' + u.id + '">Remove admin</button>')
+        : '<button class="btn-xs ok" data-promote="' + u.id + '">Make admin</button>';
+      return '<tr><td>' + App.esc(u.name) + '</td>' +
+        '<td>' + App.esc(u.email) + '</td>' +
+        '<td>' + (u.role === "admin" ? '<span class="badge badge-won">admin</span>' : '<span class="badge">member</span>') + '</td>' +
+        '<td>' + action + '</td></tr>';
+    }).join("");
+
+    tb.querySelectorAll("[data-promote]").forEach(function (b) {
+      b.addEventListener("click", function () { setRole(b.getAttribute("data-promote"), "admin"); });
+    });
+    tb.querySelectorAll("[data-demote]").forEach(function (b) {
+      b.addEventListener("click", function () { if (confirm("Remove admin access from this person?")) setRole(b.getAttribute("data-demote"), "member"); });
+    });
+  }
+  async function setRole(id, role) {
+    try { await API.post("/admin/users/" + id + "/role", { role: role }); App.toast(role === "admin" ? "Admin access granted." : "Admin access removed.", "success"); loadUsers(); loadStats(); }
+    catch (e) { App.toast(e.message, "error"); }
   }
 
   /* ---- modals ---- */
@@ -215,7 +269,7 @@
   }
 
   /* ---- refresh all ---- */
-  function refresh() { loadStats(); loadReview(); loadListings(); loadFulfilment(); loadPayments(); }
+  function refresh() { loadStats(); loadReview(); loadListings(); loadFulfilment(); loadPayments(); loadUsers(); }
   refresh();
   setInterval(loadStats, 30000);
 })();

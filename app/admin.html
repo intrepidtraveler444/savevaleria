@@ -21,6 +21,7 @@
       <button data-tab="listings" role="tab" aria-selected="false">All listings</button>
       <button data-tab="fulfilment" role="tab" aria-selected="false">Fulfilment</button>
       <button data-tab="payments" role="tab" aria-selected="false">Payments</button>
+      <button data-tab="team" role="tab" aria-selected="false">Team</button>
     </div>
 
     <section class="tabpanel active" data-panel="review">
@@ -57,9 +58,20 @@
     </section>
 
     <section class="tabpanel" data-panel="payments">
+      <p class="muted">Winners pay their bid on GoFundMe, then mark it sent. Confirm each one
+         once you see the matching donation, to release the buyer's collection details.</p>
       <div class="table-wrap"><table>
-        <thead><tr><th>Item</th><th>Bidder</th><th>Amount</th><th>Status</th><th>Provider</th><th>Date</th></tr></thead>
+        <thead><tr><th>Item</th><th>Bidder</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
         <tbody data-payments></tbody>
+      </table></div>
+    </section>
+
+    <section class="tabpanel" data-panel="team">
+      <p class="muted">People with an account. Grant admin access to the family so they can
+         run the auction. Anyone can create an account from the sign-in page first.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead>
+        <tbody data-users></tbody>
       </table></div>
     </section>
   </main>

@@ -5,6 +5,54 @@ built to help fund the medical care of Valeria, an 18-year-old in intensive care
 a car accident. Direct giving via **GoFundMe remains the primary call-to-action**; the
 auction is a complementary way for the community to raise more.
 
+## Running it hands-off (operator guide)
+
+This section is for whoever runs the auction day-to-day (e.g. the family). Four topics:
+payments, handing over admin, emails, and the one thing to enable before a real launch.
+
+### 1. How auction money reaches the family (GoFundMe model)
+The default payment model is **`gofundme`**, chosen so 100% of auction money flows into the
+existing GoFundMe campaign → the family's bank, with **no bank details collected on this
+site and no card processing.** The flow:
+
+1. A bidder wins → their dashboard shows **Pay** → a page that sends them to the GoFundMe
+   donate page with the exact winning-bid amount to enter.
+2. After donating, the winner taps **"I've donated on GoFundMe"** (payment → *submitted*).
+3. An admin opens **Admin → Payments**, checks the GoFundMe donations for a matching one,
+   and clicks **Confirm received** (or **Reject** with a reason). Confirming releases the
+   winner's **collection details** and notifies both parties.
+
+> Because GoFundMe has no API, matching is a manual step — the admin ties a GoFundMe
+> donation to a winning bid. Ask winners to donate the **exact** amount so it's easy to match.
+> (To switch to automatic card payments later, set `PAYMENT_PROVIDER=stripe` — the code is ready.)
+
+### 2. Handing admin over to the family
+1. The family member creates a normal account on the site (Sign in → Create account).
+2. An existing admin opens **Admin → Team**, finds them, and clicks **Make admin**.
+3. They can now approve/reject items, set each item's **starting bid and duration**,
+   confirm payments, manage fulfilment, and resolve disputes.
+
+The first admin is seeded from the `ADMIN_EMAIL` / `ADMIN_PASSWORD` env vars on the host.
+Set a strong `ADMIN_PASSWORD` before launch.
+
+### 3. Email notifications (Resend)
+Emails (won / outbid / payment confirmed / how to collect) send via **Resend** when configured;
+otherwise they stay in-app only. To turn them on, set these env vars on the host:
+
+- `RESEND_API_KEY` — from [resend.com](https://resend.com) (free tier available)
+- `EMAIL_FROM` — a **verified** sender, e.g. `Valeria Auction <auction@yourdomain.org>`
+  (Resend requires you to verify a domain to email arbitrary recipients; until then you can
+  only email your own verified address.)
+- `SITE_URL` — your public site, e.g. `https://savevaleria.netlify.app` (used for email links)
+
+### 4. ⚠️ Before a real launch: turn on data persistence
+On Render's **free** plan the server sleeps when idle and **its storage is wiped on restart**,
+so items/bids/accounts reset and auctions may not end on time. This is fine for testing but
+**not** for a live auction. To fix, either:
+- **Render paid + disk (~$7/mo):** uncomment the `plan: starter` + `disk:` block in `render.yaml`
+  and set `DATA_DIR=/var/data`; or
+- **A managed database** (larger change — see §9).
+
 > **New here? Two-minute start:**
 > ```powershell
 > cd server

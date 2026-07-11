@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complete your payment · Valeria Auction</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💙</text></svg>" />
+  <link rel="stylesheet" href="css/auction-app.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+  <main class="page container">
+    <div class="form-card" style="max-width:520px" data-pay>
+      <div class="skeleton" style="height:220px"></div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    App.init("dashboard");
+    (function () {
+      if (!App.requireLogin()) return;
+      var host = document.querySelector("[data-pay]");
+      var paymentId = new URLSearchParams(location.search).get("payment");
+
+      function money(n) { return App.money(n); }
+
+      async function load() {
+        try {
+          var d = await API.get("/payments/" + paymentId);
+          if (d.payment.status === "paid") return renderPaid();
+          if (d.payment.status === "submitted") return renderSubmitted(d);
+          renderPay(d);
+        } catch (e) {
+          host.innerHTML = '<div class="status" data-state="error"><h3>Couldn\'t load this payment</h3><p>' +
+            App.esc(e.message) + '</p></div><a class="btn btn-ghost" href="dashboard.html">Back to dashboard</a>';
+        }
+      }
+
+      function renderPay(d) {
+        host.innerHTML =
+          '<h1 style="font-size:1.5rem">Pay your winning bid</h1>' +
+          '<p class="muted">You won <strong>' + App.esc(d.itemTitle) + '</strong>. Your winning bid is:</p>' +
+          '<div class="bid-now" style="font-size:2.4rem;margin:.25rem 0">' + money(d.payment.amount) + '</div>' +
+          '<div class="status" data-state="info" style="margin-top:1rem">' +
+            '<strong>How to pay:</strong> your payment goes straight to Valeria\'s GoFundMe, ' +
+            'so 100% supports her care. Donate the exact amount above, then come back and tap ' +
+            '"I\'ve donated".' +
+          '</div>' +
+          '<ol style="line-height:1.7;color:var(--ink-soft)">' +
+            '<li>Tap <strong>Donate ' + money(d.payment.amount) + ' on GoFundMe</strong> below.</li>' +
+            '<li>Enter <strong>' + money(d.payment.amount) + '</strong> as your donation amount and complete it.</li>' +
+            '<li>Return here and tap <strong>I\'ve donated</strong> — the organisers confirm it and send your collection details.</li>' +
+          '</ol>' +
+          '<a class="btn btn-accent btn-block btn-lg" href="' + App.esc(d.gofundmeUrl) + '" target="_blank" rel="noopener" data-gfm>' +
+            '💙 Donate ' + money(d.payment.amount) + ' on GoFundMe</a>' +
+          '<button class="btn btn-ghost btn-block" style="margin-top:.75rem" data-done>I\'ve donated on GoFundMe</button>' +
+          '<p class="field-help" style="margin-top:.75rem">Please donate the exact amount so the organisers can match your payment to this item.</p>';
+
+        host.querySelector("[data-done]").addEventListener("click", async function (e) {
+          var btn = e.currentTarget;
+          btn.setAttribute("aria-disabled", "true"); btn.textContent = "Submitting…";
+          try {
+            await API.post("/payments/submitted", { paymentId: paymentId });
+            renderSubmitted(d);
+          } catch (err) {
+            btn.removeAttribute("aria-disabled"); btn.textContent = "I've donated on GoFundMe";
+            App.toast(err.message, "error");
+          }
+        });
+      }
+
+      function renderSubmitted(d) {
+        host.innerHTML =
+          '<div class="status" data-state="success"><h3>Thank you! 💙</h3>' +
+          '<p>We\'ve noted your GoFundMe donation of <strong>' + money(d.payment.amount) + '</strong>. ' +
+          'The organisers will confirm it was received and then send you the collection details ' +
+          '(you\'ll get a notification and, if enabled, an email).</p></div>' +
+          '<a class="btn btn-ghost" href="dashboard.html">Back to my dashboard</a>';
+      }
+
+      function renderPaid() {
+        host.innerHTML =
+          '<div class="status" data-state="success"><h3>Payment confirmed ✓</h3>' +
+          '<p>This item is paid. Check your dashboard or notifications for collection details.</p></div>' +
+          '<a class="btn btn-ghost" href="dashboard.html">Back to my dashboard</a>';
+      }
+
+      load();
+    })();
+  </script>
+</body>
+</html>

@@ -10,6 +10,7 @@ const store = require("../lib/store");
 const auth = require("../lib/auth");
 const { notify } = require("../lib/notify");
 const { publicItem } = require("../lib/serialize");
+const { markPaid } = require("../lib/settle");
 const { ok, fail, readJson } = require("../lib/http");
 
 function admin(req, res) { return auth.requireAuth(req, res, { role: "admin" }); }
@@ -147,6 +148,51 @@ module.exports = function register(router) {
     ok(res, { item: publicItem(store.byId("items", item.id), { includeDonor: true }) });
   });
 
+  /* ---- Confirm / reject a GoFundMe payment ----
+     A winner marks their bid "sent" on GoFundMe (status "submitted"); an admin
+     verifies it arrived and confirms, which releases the collection details. */
+  router.post("/api/admin/payments/:id/confirm", (req, res) => {
+    if (!admin(req, res)) return;
+    const payment = store.byId("payments", req.params.id);
+    if (!payment) return fail(res, 404, "Payment not found.");
+    if (payment.status === "paid") return ok(res, { paid: true });
+    const { item, instructions } = markPaid(payment);
+    ok(res, { paid: true, item: publicItem(item, { includeDonor: true }), instructions });
+  });
+
+  router.post("/api/admin/payments/:id/reject", async (req, res) => {
+    if (!admin(req, res)) return;
+    const payment = store.byId("payments", req.params.id);
+    if (!payment) return fail(res, 404, "Payment not found.");
+    const body = await readJson(req).catch(() => ({}));
+    const reason = String(body.reason || "").trim() || "We couldn't match your GoFundMe payment. Please check and try again.";
+    store.update("payments", payment.id, { status: "pending", rejectedAt: new Date().toISOString() });
+    notify(payment.bidderId, "payment-rejected", `Payment for your winning item wasn't confirmed: ${reason}`, { itemId: payment.itemId });
+    ok(res, { ok: true });
+  });
+
+  /* ---- Team / admins: list users, promote or demote ---- */
+  router.get("/api/admin/users", (req, res) => {
+    if (!admin(req, res)) return;
+    const users = store.all("users").map((u) => ({
+      id: u.id, name: u.name, email: u.email, role: u.role, createdAt: u.createdAt,
+    })).sort((a, b) => (a.role === "admin" ? -1 : 1) - (b.role === "admin" ? -1 : 1) || new Date(b.createdAt) - new Date(a.createdAt));
+    ok(res, { users });
+  });
+
+  router.post("/api/admin/users/:id/role", async (req, res) => {
+    const me = admin(req, res); if (!me) return;
+    const target = store.byId("users", req.params.id);
+    if (!target) return fail(res, 404, "User not found.");
+    const body = await readJson(req).catch(() => ({}));
+    const role = body.role === "admin" ? "admin" : "member";
+    // Guard: don't let an admin demote themselves (avoids locking everyone out).
+    if (target.id === me.id && role !== "admin") return fail(res, 400, "You can't remove your own admin access.");
+    store.update("users", target.id, { role });
+    if (role === "admin") notify(target.id, "role", "You've been given admin access to the auction console.");
+    ok(res, { user: { id: target.id, name: target.name, email: target.email, role } });
+  });
+
   /* ---- Payments overview ---- */
   router.get("/api/admin/payments", (req, res) => {
     if (!admin(req, res)) return;
@@ -170,12 +216,14 @@ module.exports = function register(router) {
     const paid = store.filter("payments", (p) => p.status === "paid");
     const raised = paid.reduce((s, p) => s + p.amount, 0);
     const pendingPayments = store.filter("payments", (p) => p.status === "pending");
+    const submittedPayments = store.filter("payments", (p) => p.status === "submitted");
     const byStatus = {};
     for (const i of items) byStatus[i.status] = (byStatus[i.status] || 0) + 1;
     ok(res, {
       stats: {
         totalRaised: raised,
         awaitingPayment: pendingPayments.reduce((s, p) => s + p.amount, 0),
+        awaitingConfirmation: submittedPayments.length,
         itemsByStatus: byStatus,
         totalItems: items.length,
         totalBids: store.all("bids").length,
