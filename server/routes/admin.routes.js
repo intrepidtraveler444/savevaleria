@@ -3,6 +3,8 @@
    manage fulfilment, resolve disputes, and view fundraising statistics.
    ============================================================================= */
 "use strict";
+const fs = require("fs");
+const path = require("path");
 const cfg = require("../config");
 const store = require("../lib/store");
 const auth = require("../lib/auth");
@@ -102,6 +104,46 @@ module.exports = function register(router) {
     } else {
       return fail(res, 400, "action must be 'open' or 'resolve'.");
     }
+    ok(res, { item: publicItem(store.byId("items", item.id), { includeDonor: true }) });
+  });
+
+  /* ---- Take down / remove a listing ----
+     Pulls an item from the auction. By default it's a soft removal (kept with a
+     "removed" status for the record); pass { purge: true } to delete it entirely
+     (item, its bids, payments, and uploaded photos). Everyone involved is notified
+     and any pending payment is cancelled. */
+  router.post("/api/admin/items/:id/takedown", async (req, res) => {
+    if (!admin(req, res)) return;
+    const item = store.byId("items", req.params.id);
+    if (!item) return fail(res, 404, "Item not found.");
+    const body = await readJson(req).catch(() => ({}));
+    const reason = String(body.reason || "").trim() || "This item has been removed from the auction.";
+    const purge = body.purge === true;
+
+    // Notify any bidders that the auction was withdrawn, plus the donor.
+    const bidderIds = new Set(store.filter("bids", (b) => b.itemId === item.id).map((b) => b.bidderId));
+    for (const uid of bidderIds) {
+      notify(uid, "auction-removed", `The auction for "${item.title}" has been withdrawn by the organisers, so bidding has ended. We're sorry for the inconvenience.`, { itemId: item.id });
+    }
+    notify(item.donorId, "item-removed", `Your item "${item.title}" has been taken down: ${reason}`, { itemId: item.id });
+
+    // Cancel any pending payment tied to it.
+    for (const p of store.filter("payments", (p) => p.itemId === item.id && p.status === "pending")) {
+      store.update("payments", p.id, { status: "cancelled" });
+    }
+
+    if (purge) {
+      // Permanently delete photos, bids, payments, and the item record.
+      (item.photos || []).forEach((rel) => {
+        try { fs.unlinkSync(path.join(cfg.paths.uploads, path.basename(rel))); } catch (e) {}
+      });
+      store.filter("bids", (b) => b.itemId === item.id).forEach((b) => store.remove("bids", b.id));
+      store.filter("payments", (p) => p.itemId === item.id).forEach((p) => store.remove("payments", p.id));
+      store.remove("items", item.id);
+      return ok(res, { removed: true, purged: true, id: item.id });
+    }
+
+    store.update("items", item.id, { status: "removed", removedReason: reason, removedAt: new Date().toISOString() });
     ok(res, { item: publicItem(store.byId("items", item.id), { includeDonor: true }) });
   });
 

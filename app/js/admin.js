@@ -84,9 +84,11 @@
         '<td><div class="actions">' +
           '<button class="btn-xs" data-edit="' + it.id + '">Edit</button>' +
           (it.status === "live" ? '<a class="btn-xs" href="item.html?id=' + it.id + '" target="_blank">View</a>' : "") +
+          (it.status !== "removed" ? '<button class="btn-xs danger" data-takedown="' + it.id + '">Take down</button>' : "") +
         '</div></td></tr>';
     }).join("") : '<tr><td colspan="6" class="muted">No listings.</td></tr>';
     tb.querySelectorAll("[data-edit]").forEach(function (b) { b.addEventListener("click", function () { editModal(b.getAttribute("data-edit")); }); });
+    tb.querySelectorAll("[data-takedown]").forEach(function (b) { b.addEventListener("click", function () { takedownModal(b.getAttribute("data-takedown")); }); });
   }
   document.querySelector("[data-status-filter]").addEventListener("change", loadListings);
 
@@ -171,6 +173,29 @@
           startingBid: document.getElementById("e-start").value,
         });
         App.toast("Saved.", "success"); modal.close(); refresh();
+      } catch (e) { App.toast(e.message, "error"); }
+    });
+  }
+
+  function takedownModal(id) {
+    openModal('<h3>Take down item</h3>' +
+      '<p class="muted">Removes this item from the auction. The donor and any bidders are ' +
+      'notified, and any pending payment is cancelled.</p>' +
+      '<div class="field"><label for="td-reason">Reason (shared with the donor)</label>' +
+      '<textarea id="td-reason" rows="2" placeholder="e.g. Withdrawn at the donor\'s request."></textarea></div>' +
+      '<label class="checkbox"><input type="checkbox" id="td-purge" /> ' +
+      '<span>Also delete permanently — removes all record of it, its bids and photos. ' +
+      'Leave unticked to keep it with a "removed" status.</span></label>' +
+      '<div class="wizard-actions"><button class="btn btn-ghost" data-close>Cancel</button>' +
+      '<button class="btn btn-accent" data-do>Take down</button></div>');
+    modal.querySelector("[data-do]").addEventListener("click", async function () {
+      try {
+        var r = await API.post("/admin/items/" + id + "/takedown", {
+          reason: document.getElementById("td-reason").value,
+          purge: document.getElementById("td-purge").checked,
+        });
+        App.toast(r.purged ? "Item deleted permanently." : "Item taken down.", "info");
+        modal.close(); refresh();
       } catch (e) { App.toast(e.message, "error"); }
     });
   }
