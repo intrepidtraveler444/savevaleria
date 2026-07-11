@@ -89,6 +89,38 @@
     }
   })();
 
+  /* --------------------------------------- 3b. live sync from GoFundMe ---- */
+  (function syncGoFundMe() {
+    var s = CFG.gofundmeSync || {};
+    if (!s.enabled || !s.apiBase) return;                 // syncing disabled
+
+    fetch(s.apiBase.replace(/\/+$/, "") + "/api/gofundme")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.raised) return;                      // keep config fallback
+        var currency = f.currency;
+        var raised = Number(d.raised);
+        var goal = (s.syncGoal && d.goal) ? Number(d.goal) : (Number(f.goal) || 0);
+
+        setText("raised", money(raised, currency));
+        if (s.syncGoal && d.goal) setText("goal", money(goal, currency));
+        if (d.donations != null) setText("donors", Number(d.donations).toLocaleString("en-US"));
+
+        // Re-fill the progress bar to the live percentage.
+        var pct = goal > 0 ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
+        setText("percent", pct + "%");
+        var bar = bind("progressbar")[0];
+        var fill = bind("progressfill")[0];
+        if (bar) bar.setAttribute("aria-valuenow", String(pct));
+        if (fill) fill.style.width = pct + "%";
+
+        // Reflect that figures are live.
+        setText("lastUpdated", new Date().toLocaleDateString("en-US",
+          { day: "numeric", month: "long", year: "numeric" }));
+      })
+      .catch(function () { /* offline / blocked — the config numbers stay */ });
+  })();
+
   /* ------------------------------------------------ 4. updates timeline --- */
   (function renderUpdates() {
     var host = bind("updates")[0];

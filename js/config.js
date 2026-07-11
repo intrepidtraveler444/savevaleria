@@ -29,13 +29,25 @@ window.CAMPAIGN_CONFIG = {
      control the progress bar. Values are plain numbers (no commas/symbols).   */
   fundraising: {
     goal: 35000,        // Fundraising target (USD)
-    raised: 7995,       // Amount raised so far (USD)
-    donors: 111,        // Number of contributors
+    raised: 8005,       // Fallback "raised" (USD) — used only if the live sync below fails
+    donors: 112,        // Fallback number of contributors
     currency: "USD",
     // The family's estimate of ongoing hospital + ICU cost, highlighted on the site.
     dailyCost: 4000,
     // Set to a date string (e.g. "10 July 2026") to show when figures were last checked.
-    lastUpdated: "10 July 2026",
+    lastUpdated: "11 July 2026",
+  },
+
+  /* ---- Live GoFundMe sync --------------------------------------------------
+     When enabled, the page pulls the real "raised" amount (and donor count) from
+     the GoFundMe campaign via the backend API, so the progress bar stays current.
+     If the API is unreachable, the numbers above are shown instead.
+       apiBase  — your deployed backend (Render). Leave "" to disable syncing.
+       syncGoal — also pull the goal from GoFundMe (off = keep the goal above).    */
+  gofundmeSync: {
+    enabled: true,
+    apiBase: "https://valeria-auction.onrender.com",
+    syncGoal: false,
   },
 
   /* ---- Updates feed -------------------------------------------------------

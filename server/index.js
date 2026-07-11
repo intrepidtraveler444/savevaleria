@@ -29,6 +29,7 @@ require("./routes/items.routes")(api);
 require("./routes/auctions.routes")(api);
 require("./routes/payments.routes")(api);
 require("./routes/admin.routes")(api);
+require("./routes/gofundme.routes")(api);
 
 // Settle finished auctions periodically (belt-and-braces alongside lazy finalisation).
 setInterval(() => { try { finalizeDue(); } catch (e) { console.error(e); } }, 30000).unref();

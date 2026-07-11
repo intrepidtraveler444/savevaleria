@@ -29,6 +29,13 @@ module.exports = {
   // auth uses bearer tokens, not cookies. Restrict to your site's URL if you like.
   cors: { origin: CORS_ORIGIN },
 
+  // Live GoFundMe figures for the front-page progress bar (scraped + cached).
+  gofundme: {
+    url: process.env.GOFUNDME_CAMPAIGN_URL ||
+      "https://www.gofundme.com/f/help-valeria-recover-after-devastating-accident",
+    cacheMinutes: Number(process.env.GOFUNDME_CACHE_MINUTES) || 10,
+  },
+
   // Where the JSON database and uploaded photos live.
   paths: {
     root: ROOT,
