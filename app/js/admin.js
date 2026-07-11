@@ -44,7 +44,7 @@
         '<td>' + App.money(it.estimatedValue) + '</td>' +
         '<td>' + (it.reservePrice ? App.money(it.reservePrice) : "—") + '</td>' +
         '<td><input type="number" min="1" placeholder="Start $" value="' + Math.max(1, Math.round((it.estimatedValue || 20) * 0.1)) + '" data-start="' + it.id + '" style="width:90px" /> ' +
-            '<input type="number" min="1" placeholder="Hours" value="120" data-hours="' + it.id + '" style="width:80px" /></td>' +
+            '<input type="number" min="1" placeholder="Hours" value="' + (it.requestedDurationHours || 120) + '" data-hours="' + it.id + '" style="width:80px" title="Donor asked for ' + (it.requestedDurationHours ? Math.round(it.requestedDurationHours / 24) + ' days' : 'no preference') + '" /></td>' +
         '<td><div class="actions">' +
           '<button class="btn-xs ok" data-approve="' + it.id + '">Approve</button>' +
           '<button class="btn-xs danger" data-reject="' + it.id + '">Reject</button>' +

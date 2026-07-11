@@ -55,6 +55,10 @@ module.exports = function register(router) {
 
     const photos = saveDataUrls(body.photos || []);
 
+    // Donor's preferred auction length (days). Clamped to a sane range; the admin
+    // confirms/overrides the final duration at approval.
+    const reqDays = Math.min(30, Math.max(1, Math.round(num(body.requestedDurationDays)) || 7));
+
     const item = {
       id: crypto.randomUUID(),
       donorId: user.id,
@@ -63,6 +67,7 @@ module.exports = function register(router) {
       estimatedValue,
       startingBid: null,                 // set by admin at approval
       reservePrice,
+      requestedDurationHours: reqDays * 24,
       photos,
       status: "pending",
       collection: {

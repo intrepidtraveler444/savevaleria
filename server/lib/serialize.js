@@ -43,6 +43,7 @@ function publicItem(item, { includeDonor = false } = {}) {
     out.contact = item.contact || null;
     out.rejectionReason = item.rejectionReason || null;
     out.winnerId = item.winnerId || null;
+    out.requestedDurationHours = item.requestedDurationHours || null;
   }
   return out;
 }

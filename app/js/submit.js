@@ -124,6 +124,7 @@
         "<dt>Category</dt><dd>" + App.esc(v("category")) + "</dd>" +
         "<dt>Est. value</dt><dd>" + App.money(Number(v("estimatedValue"))) + "</dd>" +
         (v("reservePrice") ? "<dt>Reserve</dt><dd>" + App.money(Number(v("reservePrice"))) + "</dd>" : "") +
+        "<dt>Auction length</dt><dd>" + App.esc(v("requestedDurationDays")) + " days (preferred)</dd>" +
         "<dt>Photos</dt><dd>" + photos.length + " attached</dd>" +
         "<dt>Location</dt><dd>" + App.esc(v("location")) + "</dd>" +
         "<dt>Shipping</dt><dd>" + (shipChk.checked ? "Available" : "Collection only") + "</dd>" +
@@ -140,6 +141,7 @@
       await API.post("/items", {
         title: v("title"), category: v("category"), description: v("description"),
         condition: v("condition"), estimatedValue: v("estimatedValue"), reservePrice: v("reservePrice"),
+        requestedDurationDays: v("requestedDurationDays"),
         photos: photos,
         collection: {
           location: v("location"), shippingAvailable: shipChk.checked,

@@ -70,6 +70,17 @@
           <p class="field-help">If bidding doesn't reach the reserve, the item won't sell. Kept private from bidders.</p>
           <p class="field-error" data-err="reservePrice" hidden></p>
         </div>
+        <div class="field">
+          <label for="w-duration">How long should the auction run? <span class="req">*</span></label>
+          <select id="w-duration" name="requestedDurationDays" required>
+            <option value="3">3 days</option>
+            <option value="5">5 days</option>
+            <option value="7" selected>7 days</option>
+            <option value="10">10 days</option>
+            <option value="14">14 days</option>
+          </select>
+          <p class="field-help">Your preferred length. The organisers confirm the final timing when they approve your item.</p>
+        </div>
       </fieldset>
 
       <!-- Step 2: photos -->
